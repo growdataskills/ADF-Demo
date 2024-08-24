@@ -1,5 +1,5 @@
 {
-	"name": "salesPipeline",
+	"name": "salesPipelineADF",
 	"properties": {
 		"activities": [
 			{
