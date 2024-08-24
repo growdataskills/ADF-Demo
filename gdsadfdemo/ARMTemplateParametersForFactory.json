@@ -1,0 +1,21 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "gdsadfdemo"
+		},
+		"Snowflake_password": {
+			"value": ""
+		},
+		"SourceADLS_accountKey": {
+			"value": ""
+		},
+		"Snowflake_properties_typeProperties_database": {
+			"value": "SALES_MART"
+		},
+		"SourceADLS_properties_typeProperties_url": {
+			"value": "https://adlsaccountgds.dfs.core.windows.net/"
+		}
+	}
+}

@@ -1,0 +1,303 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "gdsadfdemo"
+		},
+		"Snowflake_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Snowflake'"
+		},
+		"SourceADLS_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'SourceADLS'"
+		},
+		"Snowflake_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "SALES_MART"
+		},
+		"SourceADLS_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://adlsaccountgds.dfs.core.windows.net/"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/salesPipeline')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Dataflow",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "SalesDataTransformFlow",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"salesInput": {},
+									"sink": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/SalesDataTransformFlow')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SnowflakeTable')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Snowflake",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SnowflakeV2Table",
+				"schema": [
+					{
+						"name": "YEAR_ID",
+						"type": "NUMBER",
+						"precision": 38,
+						"scale": 0
+					},
+					{
+						"name": "MONTH_ID",
+						"type": "NUMBER",
+						"precision": 38,
+						"scale": 0
+					},
+					{
+						"name": "TOTALSALES",
+						"type": "NUMBER",
+						"precision": 18,
+						"scale": 2
+					}
+				],
+				"typeProperties": {
+					"schema": "PUBLIC",
+					"table": "SALESAGGREGATE"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Snowflake')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SourceSalesData')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SourceADLS",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "sales_data.csv",
+						"folderPath": "Raw_Data",
+						"fileSystem": "synapse-data-store"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "ORDERNUMBER",
+						"type": "String"
+					},
+					{
+						"name": "QUANTITYORDERED",
+						"type": "String"
+					},
+					{
+						"name": "PRICEEACH",
+						"type": "String"
+					},
+					{
+						"name": "ORDERLINENUMBER",
+						"type": "String"
+					},
+					{
+						"name": "SALES",
+						"type": "String"
+					},
+					{
+						"name": "ORDERDATE",
+						"type": "String"
+					},
+					{
+						"name": "STATUS",
+						"type": "String"
+					},
+					{
+						"name": "QTR_ID",
+						"type": "String"
+					},
+					{
+						"name": "MONTH_ID",
+						"type": "String"
+					},
+					{
+						"name": "YEAR_ID",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/SourceADLS')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Snowflake')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "SnowflakeV2",
+				"typeProperties": {
+					"authenticationType": "Basic",
+					"accountIdentifier": "guxyhix-bq53873",
+					"user": "growdataskills",
+					"database": "[parameters('Snowflake_properties_typeProperties_database')]",
+					"warehouse": "COMPUTE_WH",
+					"role": "ACCOUNTADMIN",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Snowflake_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SourceADLS')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('SourceADLS_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('SourceADLS_accountKey')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SalesDataTransformFlow')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "SourceSalesData",
+								"type": "DatasetReference"
+							},
+							"name": "salesInput"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "SnowflakeTable",
+								"type": "DatasetReference"
+							},
+							"name": "sink"
+						}
+					],
+					"transformations": [
+						{
+							"name": "filter"
+						},
+						{
+							"name": "aggregate"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          ORDERNUMBER as integer,",
+						"          QUANTITYORDERED as integer,",
+						"          PRICEEACH as float,",
+						"          ORDERLINENUMBER as integer,",
+						"          SALES as float,",
+						"          ORDERDATE as date,",
+						"          STATUS as string,",
+						"          QTR_ID as integer,",
+						"          MONTH_ID as integer,",
+						"          YEAR_ID as integer",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> salesInput",
+						"salesInput filter(SALES>=2000) ~> filter",
+						"filter aggregate(groupBy(YEAR_ID,",
+						"          MONTH_ID),",
+						"     TOTALSALES = sum(SALES)) ~> aggregate",
+						"aggregate sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          YEAR_ID as string,",
+						"          MONTH_ID as string,",
+						"          TOTALSALES as string",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     stageInsert: true) ~> sink"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SourceSalesData')]",
+				"[concat(variables('factoryId'), '/datasets/SnowflakeTable')]"
+			]
+		}
+	]
+}
