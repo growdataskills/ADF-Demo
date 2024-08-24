@@ -1,0 +1,47 @@
+{
+	"name": "SalesDataTransformFlow",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "SourceSalesData",
+						"type": "DatasetReference"
+					},
+					"name": "salesInput"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "filter"
+				},
+				{
+					"name": "aggregate"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          ORDERNUMBER as integer,",
+				"          QUANTITYORDERED as integer,",
+				"          PRICEEACH as float,",
+				"          ORDERLINENUMBER as integer,",
+				"          SALES as float,",
+				"          ORDERDATE as date,",
+				"          STATUS as string,",
+				"          QTR_ID as integer,",
+				"          MONTH_ID as integer,",
+				"          YEAR_ID as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> salesInput",
+				"salesInput filter(SALES>=2000) ~> filter",
+				"filter aggregate(groupBy(YEAR_ID,",
+				"          MONTH_ID),",
+				"     TotalSales = sum(SALES)) ~> aggregate"
+			]
+		}
+	}
+}
