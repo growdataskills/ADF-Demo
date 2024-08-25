@@ -5,25 +5,13 @@
 		"factoryName": {
 			"value": "gdsadfdemo"
 		},
-		"AzureDataLakeStorageTemp_accountKey": {
-			"value": ""
-		},
 		"Snowflake_password": {
-			"value": ""
-		},
-		"SnowflakeTemp_password": {
 			"value": ""
 		},
 		"SourceADLS_accountKey": {
 			"value": ""
 		},
-		"AzureDataLakeStorageTemp_properties_typeProperties_url": {
-			"value": "https://adlsaccountgds.dfs.core.windows.net/"
-		},
 		"Snowflake_properties_typeProperties_database": {
-			"value": "SALES_MART"
-		},
-		"SnowflakeTemp_properties_typeProperties_database": {
 			"value": "SALES_MART"
 		},
 		"SourceADLS_properties_typeProperties_url": {

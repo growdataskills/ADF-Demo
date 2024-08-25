@@ -7,31 +7,15 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "gdsadfdemo"
 		},
-		"AzureDataLakeStorageTemp_accountKey": {
-			"type": "secureString",
-			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorageTemp'"
-		},
 		"Snowflake_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'Snowflake'"
-		},
-		"SnowflakeTemp_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'SnowflakeTemp'"
 		},
 		"SourceADLS_accountKey": {
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'SourceADLS'"
 		},
-		"AzureDataLakeStorageTemp_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://adlsaccountgds.dfs.core.windows.net/"
-		},
 		"Snowflake_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "SALES_MART"
-		},
-		"SnowflakeTemp_properties_typeProperties_database": {
 			"type": "string",
 			"defaultValue": "SALES_MART"
 		},
@@ -66,26 +50,14 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
-					"AzureDataLakeStorageTemp_accountKey": {
-						"value": "[parameters('AzureDataLakeStorageTemp_accountKey')]"
-					},
 					"Snowflake_password": {
 						"value": "[parameters('Snowflake_password')]"
-					},
-					"SnowflakeTemp_password": {
-						"value": "[parameters('SnowflakeTemp_password')]"
 					},
 					"SourceADLS_accountKey": {
 						"value": "[parameters('SourceADLS_accountKey')]"
 					},
-					"AzureDataLakeStorageTemp_properties_typeProperties_url": {
-						"value": "[parameters('AzureDataLakeStorageTemp_properties_typeProperties_url')]"
-					},
 					"Snowflake_properties_typeProperties_database": {
 						"value": "[parameters('Snowflake_properties_typeProperties_database')]"
-					},
-					"SnowflakeTemp_properties_typeProperties_database": {
-						"value": "[parameters('SnowflakeTemp_properties_typeProperties_database')]"
 					},
 					"SourceADLS_properties_typeProperties_url": {
 						"value": "[parameters('SourceADLS_properties_typeProperties_url')]"
